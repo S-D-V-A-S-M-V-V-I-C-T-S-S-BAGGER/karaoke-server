@@ -13,21 +13,6 @@ interface SearchProps {
   results: SearchResults[]
 }
 
-export function ProcessRaw(raw) {
-  return raw.map((value) => {
-    return {
-      title:value.title,
-      videoId: value.id.videoId,
-      videoUrl: value.url,
-      thumbnail: {
-        url: value.snippet.thumbnails.url,
-        width: value.snippet.thumbnails.width,
-        height: value.snippet.thumbnails.height
-      }
-    }
-  })
-}
-
 export function SearchResults({results}: SearchProps) {
   const components = results.map((value, index) => {
     

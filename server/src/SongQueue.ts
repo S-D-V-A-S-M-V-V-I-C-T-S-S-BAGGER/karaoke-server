@@ -1,8 +1,7 @@
 import path from "path";
 import youtubedl from "ytdl-core";
-import ffmpeg from "fluent-ffmpeg";
+import ffmpeg from "ffmpeg";
 import execa from "execa";
-import { mkdir } from "fs/promises";
 
 export interface Song {
   artist: string;
@@ -17,12 +16,12 @@ export interface Admission {
 }
 
 function downloadMp3(youtubeId: string, targetLocation: string): Promise<void> {
-  console.log("Downloading " + youtubeId);
   const stream = youtubedl("https://www.youtube.com/watch?v=" + youtubeId, {
     quality: "highestaudio",
   });
 
   return new Promise((resolve) => {
+    // @ts-ignore
     ffmpeg(stream)
       .audioBitrate(128)
       .save(targetLocation)
@@ -48,7 +47,7 @@ export class SongQueue {
     admissions.reverse();
 
     const firstUnprocessedSong = admissions.find(
-      (adm) => !adm.song.processedItem
+      (adm) => adm.song.processedItem
     )?.song;
 
     if (!firstUnprocessedSong) {
@@ -60,7 +59,6 @@ export class SongQueue {
     const url =
       "https://www.youtube.com/watch?v=" + firstUnprocessedSong.youtubeId;
     const folder = path.join(__dirname, "../songs", firstUnprocessedSong.name);
-    await mkdir(folder, { recursive: true });
     const mp3Loc = path.join(folder, "audio.mp3");
     await downloadMp3(firstUnprocessedSong.youtubeId, mp3Loc);
 
